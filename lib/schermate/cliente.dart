@@ -282,6 +282,7 @@ Widget campo(String etichetta, TextEditingController c,
         int righe = 1,
         bool maiuscole = false,
         bool nascosto = false,
+        String? esempio,
         Widget? suffisso}) =>
     Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -295,6 +296,6 @@ Widget campo(String etichetta, TextEditingController c,
         textCapitalization: maiuscole
             ? TextCapitalization.words
             : (tastiera == null ? TextCapitalization.sentences : TextCapitalization.none),
-        decoration: InputDecoration(labelText: etichetta, errorText: errore, suffixIcon: suffisso),
+        decoration: InputDecoration(labelText: etichetta, hintText: esempio, errorText: errore, suffixIcon: suffisso),
       ),
     );

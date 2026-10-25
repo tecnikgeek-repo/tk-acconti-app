@@ -176,11 +176,11 @@ void main() {
 
   test('impostazioni della versione Kotlin: SharedPreferences e DataStore', () {
     final xml = '<?xml version=\'1.0\' encoding=\'utf-8\' standalone=\'yes\' ?>\n<map>\n'
-        '    <string name="sito">https://pietrodefilippis.it</string>\n'
+        '    <string name="sito">https://esempio.it</string>\n'
         '    <string name="password">a&amp;b&lt;c</string>\n'
         '    <long name="ultima" value="1760000000000" />\n</map>\n';
     final v = leggiSharedPreferencesXml(xml);
-    expect(v['sito'], 'https://pietrodefilippis.it');
+    expect(v['sito'], 'https://esempio.it');
     expect(v['password'], 'a&b<c');
     expect(v['ultima'], '1760000000000');
 

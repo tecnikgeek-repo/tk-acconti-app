@@ -23,7 +23,7 @@ class SchermataImpostazioni extends StatefulWidget {
 }
 
 class _SchermataImpostazioniState extends State<SchermataImpostazioni> {
-  late final _sito = TextEditingController(text: impostazioni.sito.isEmpty ? sitoPredefinito : impostazioni.sito);
+  late final _sito = TextEditingController(text: impostazioni.sito);
   late final _password = TextEditingController(text: impostazioni.password);
   bool _vedi = false;
   bool _bioDisponibile = false;
@@ -85,8 +85,9 @@ class _SchermataImpostazioniState extends State<SchermataImpostazioni> {
   }
 
   Future<void> _sincronizza() async {
+    if (_sito.text.trim().isEmpty) return avviso(context, 'Scrivi l\'indirizzo del tuo sito');
     if (_password.text.trim().isEmpty) return avviso(context, 'Scrivi la password di Acconti del sito');
-    await impostazioni.salvaSync(_sito.text.trim().isEmpty ? sitoPredefinito : _sito.text, _password.text);
+    await impostazioni.salvaSync(_sito.text, _password.text);
     _sito.text = impostazioni.sito;
     final esito = await sincronizzazione.sincronizza();
     if (mounted) avviso(context, esito);
@@ -179,7 +180,7 @@ class _SchermataImpostazioniState extends State<SchermataImpostazioni> {
                         'vince la modifica più recente. Serve il plugin tk-acconti 1.5.0 o successivo.',
                         style: TextStyle(color: grigio500, fontSize: 13)),
                     const SizedBox(height: 12),
-                    campo('Indirizzo del sito', _sito, tastiera: TextInputType.url),
+                    campo('Indirizzo del sito', _sito, tastiera: TextInputType.url, esempio: 'https://iltuosito.it'),
                     campo('Password di Acconti', _password,
                         tastiera: TextInputType.visiblePassword,
                         nascosto: !_vedi,

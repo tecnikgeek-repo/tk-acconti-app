@@ -9,8 +9,6 @@ import 'archivio.dart';
 import 'impostazioni.dart';
 import 'modelli.dart';
 
-const sitoPredefinito = 'https://pietrodefilippis.it';
-
 class Sincronizzazione extends ChangeNotifier {
   Sincronizzazione(this.archivio, this.impostazioni);
 
