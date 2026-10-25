@@ -10,7 +10,6 @@ import 'package:share_plus/share_plus.dart';
 
 import '../app.dart';
 import '../dati/formati.dart';
-import '../dati/sincronizzazione.dart';
 import '../tema.dart';
 import 'blocco.dart';
 import 'cliente.dart';
@@ -175,10 +174,16 @@ class _SchermataImpostazioniState extends State<SchermataImpostazioni> {
                 ListenableBuilder(
                   listenable: sincronizzazione,
                   builder: (context, _) => _card(Icons.sync_rounded, 'Sincronizzazione col sito', [
-                    const Text(
-                        'Tiene allineati telefono e pagina Acconti del sito: per ogni cliente, progetto o acconto '
-                        'vince la modifica più recente. Serve il plugin tk-acconti 1.5.0 o successivo.',
-                        style: TextStyle(color: grigio500, fontSize: 13)),
+                    const TestoConLink(
+                        '**Facoltativa.** Funziona solo se hai un sito WordPress con il plugin '
+                        '[tk-acconti](https://pietrodefilippis.it/plugin/#pdc-tk-acconti) installato (versione 1.5.0 '
+                        'o successiva): senza il plugin non c\'è niente con cui sincronizzare.\n\n'
+                        'Se ce l\'hai, scrivi qui l\'indirizzo del tuo sito e la password di Acconti impostata nel '
+                        'plugin: telefono e sito restano allineati e per ogni cliente, progetto o acconto vince la '
+                        'modifica più recente. Senza sincronizzazione l\'app funziona lo stesso e i dati restano sul '
+                        'telefono.',
+                        coloreLink: accento,
+                        stile: TextStyle(color: grigio500, fontSize: 13, height: 1.4)),
                     const SizedBox(height: 12),
                     campo('Indirizzo del sito', _sito, tastiera: TextInputType.url, esempio: 'https://iltuosito.it'),
                     campo('Password di Acconti', _password,
