@@ -143,7 +143,7 @@ class SchermataSegnalatore extends StatelessWidget {
           Future<void> whatsApp(ProgettoConAcconti pc, StatoProvvigione stato) async {
             final ok = await apriWhatsApp(
                 s.telefono, messaggioSegnalatore(stato, s.nome, pc.progetto.nome, nomeCliente(pc), pc.progetto.provvigione));
-            if (!ok && context.mounted) avviso(context, 'WhatsApp non disponibile su questo telefono');
+            if (!ok && context.mounted) avviso(context, 'Nessuna app di messaggistica disponibile su questo telefono');
           }
 
           Future<void> avanza(ProgettoConAcconti pc) async {
@@ -160,7 +160,7 @@ class SchermataSegnalatore extends StatelessWidget {
             final si = await conferma(
               context,
               nuovo == StatoProvvigione.pagata ? 'Provvigione pagata' : 'Lavoro finito',
-              'Vuoi avvisare ${s.nome.trim().split(' ').first} su WhatsApp?',
+              'Vuoi avvisare ${s.nome.trim().split(' ').first} con un messaggio in chat?',
               si: 'Invia messaggio',
               pericolo: false,
             );
@@ -221,7 +221,7 @@ class SchermataSegnalatore extends StatelessWidget {
                     Row(children: [
                       if (s.telefono.trim().isNotEmpty) ...[
                         Expanded(
-                          child: Tasto('Scrivi su WhatsApp',
+                          child: Tasto('Scrivi in chat',
                               icona: Icons.chat_rounded,
                               colore: bianco,
                               fondo: whatsapp,
@@ -382,7 +382,7 @@ class _SchermataModificaSegnalatoreState extends State<SchermataModificaSegnalat
                   child: Column(children: [
                     campo('Nome e cognome *', _nome,
                         errore: _errore, maiuscole: true, onChanged: (_) => setState(() => _errore = null)),
-                    campo('Telefono (WhatsApp)', _telefono, tastiera: TextInputType.phone),
+                    campo('Telefono (per i messaggi)', _telefono, tastiera: TextInputType.phone),
                     campo('Note', _note, righe: 3),
                   ]),
                 ),

@@ -255,12 +255,12 @@ class _SchermataModificaClienteState extends State<SchermataModificaCliente> {
               children: [
                 CardTk(
                   child: Column(children: [
-                    campo('Nome (per WhatsApp) *', _nomeWA,
+                    campo('Nome (per i messaggi) *', _nomeWA,
                         errore: _erroreNome ? 'Scrivi il nome' : null,
                         onChanged: (_) => setState(() => _erroreNome = false),
                         maiuscole: true),
                     campo('Cognome / Ragione sociale', _cognome, maiuscole: true),
-                    campo('Telefono (WhatsApp)', _telefono, tastiera: TextInputType.phone),
+                    campo('Telefono (per i messaggi)', _telefono, tastiera: TextInputType.phone),
                     campo('Email', _email, tastiera: TextInputType.emailAddress),
                     campo('Note', _note, righe: 3),
                   ]),
