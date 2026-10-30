@@ -109,14 +109,14 @@ class SchermataProgetto extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                         onTap: () async {
                           final ok = await apriWhatsApp(cliente?.telefono ?? '', riepilogoCliente(cliente, pc));
-                          if (!ok && context.mounted) avviso(context, 'WhatsApp non disponibile su questo telefono');
+                          if (!ok && context.mounted) avviso(context, 'Nessuna app di messaggistica disponibile su questo telefono');
                         },
                         child: const SizedBox(
                           height: 50,
                           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                             Icon(Icons.chat_rounded, color: bianco, size: 20),
                             SizedBox(width: 8),
-                            Text('Invia riepilogo al cliente su WhatsApp',
+                            Text('Invia riepilogo al cliente in chat',
                                 style: TextStyle(color: bianco, fontWeight: FontWeight.w800)),
                           ]),
                         ),
