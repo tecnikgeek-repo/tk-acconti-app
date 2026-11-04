@@ -1,5 +1,6 @@
 // Sincronizzazione bidirezionale col sito (plugin tk-acconti 1.5.0+): manda tutto il telefono,
 // il sito unisce i due archivi (vince la modifica più recente) e restituisce il risultato.
+import 'dart:io';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -8,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'archivio.dart';
 import 'impostazioni.dart';
 import 'modelli.dart';
+import '../kit_tk.dart';
 
 class Sincronizzazione extends ChangeNotifier {
   Sincronizzazione(this.archivio, this.impostazioni);
@@ -64,7 +66,7 @@ class Sincronizzazione extends ChangeNotifier {
           .timeout(const Duration(seconds: 45));
       if (risposta.statusCode == 401 || risposta.statusCode == 403) throw 'Password del sito errata';
       if (risposta.statusCode == 404) throw 'Indirizzo sbagliato o plugin da aggiornare (serve la 1.5.0)';
-      if (risposta.statusCode != 200) throw 'Il sito ha risposto ${risposta.statusCode}';
+      if (risposta.statusCode != 200) throw 'Il sito non risponde come dovrebbe: riprova più tardi';
       final daRimandare = await archivio.applicaDalSito(risposta.body, inizio);
       if (daRimandare) pianifica(const Duration(seconds: 4));
       messaggio = 'Sincronizzato (${archivio.clienti.length} clienti)';
@@ -73,8 +75,7 @@ class Sincronizzazione extends ChangeNotifier {
       messaggio = 'Il sito non risponde';
       ultimaOk = false;
     } catch (e) {
-      messaggio = '$e'.replaceFirst('Exception: ', '').replaceFirst('ClientException: ', '');
-      if (messaggio.contains('SocketException') || messaggio.contains('Failed host lookup')) messaggio = 'Nessuna connessione';
+      messaggio = e is SocketException || e is http.ClientException ? 'Nessuna connessione' : fraseErrore('Sincronizzazione non riuscita.', e);
       ultimaOk = false;
     }
     await impostazioni.salvaEsitoSync(adesso(), messaggio);
