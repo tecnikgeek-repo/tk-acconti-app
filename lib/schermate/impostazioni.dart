@@ -105,7 +105,7 @@ class _SchermataImpostazioniState extends State<SchermataImpostazioni> {
         await SharePlus.instance.share(ShareParams(files: [XFile(f.path)], text: 'Backup di tk-acconti'));
       }
     } catch (e) {
-      if (mounted) avviso(context, 'Esportazione non riuscita: $e');
+      if (mounted) avviso(context, fraseErrore('Esportazione non riuscita.', e));
     }
   }
 
@@ -120,7 +120,7 @@ class _SchermataImpostazioniState extends State<SchermataImpostazioni> {
       final n = await archivio.importaBackup(utf8.decode(await f.readAsBytes(), allowMalformed: true));
       if (mounted) avviso(context, 'Importati $n clienti');
     } catch (e) {
-      if (mounted) avviso(context, 'Importazione non riuscita: $e');
+      if (mounted) avviso(context, fraseErrore('Importazione non riuscita.', e));
     }
   }
 
