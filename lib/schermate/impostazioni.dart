@@ -1,4 +1,4 @@
-// Impostazioni: blocco con PIN e impronta, backup JSON.
+// Impostazioni: blocco con PIN e impronta, sincronizzazione col sito, backup JSON.
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,8 +9,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../app.dart';
+import '../dati/formati.dart';
 import '../tema.dart';
 import 'blocco.dart';
+import 'cliente.dart';
 
 class SchermataImpostazioni extends StatefulWidget {
   const SchermataImpostazioni({super.key});
@@ -20,6 +22,9 @@ class SchermataImpostazioni extends StatefulWidget {
 }
 
 class _SchermataImpostazioniState extends State<SchermataImpostazioni> {
+  late final _sito = TextEditingController(text: impostazioni.sito);
+  late final _password = TextEditingController(text: impostazioni.password);
+  bool _vedi = false;
   bool _bioDisponibile = false;
 
   @override
@@ -76,6 +81,26 @@ class _SchermataImpostazioniState extends State<SchermataImpostazioni> {
     if (!mounted) return;
     setState(() {});
     avviso(context, 'PIN impostato: verrà chiesto alla prossima apertura');
+  }
+
+  Future<void> _sincronizza() async {
+    if (_sito.text.trim().isEmpty) return avviso(context, 'Scrivi l\'indirizzo del tuo sito');
+    if (_password.text.trim().isEmpty) return avviso(context, 'Scrivi la password di Acconti del sito');
+    await impostazioni.salvaSync(_sito.text, _password.text);
+    _sito.text = impostazioni.sito;
+    final esito = await sincronizzazione.sincronizza();
+    if (mounted) avviso(context, esito);
+  }
+
+  Future<void> _disattiva() async {
+    final si = await conferma(context, 'Disattivare la sincronizzazione?',
+        'Indirizzo e password del sito vengono cancellati da questo telefono. I dati restano qui e sul sito.',
+        si: 'Disattiva');
+    if (!si) return;
+    await sincronizzazione.disattiva();
+    _sito.clear();
+    _password.clear();
+    if (mounted) avviso(context, 'Sincronizzazione disattivata');
   }
 
   Future<void> _esporta() async {
@@ -156,6 +181,51 @@ class _SchermataImpostazioniState extends State<SchermataImpostazioni> {
                     ),
                   ],
                 ]),
+                const SizedBox(height: 12),
+                ListenableBuilder(
+                  listenable: sincronizzazione,
+                  builder: (context, _) => _card(Icons.sync_rounded, 'Sincronizzazione col sito', [
+                    const TestoConLink(
+                        '**Facoltativa.** Funziona solo se hai un sito WordPress con il plugin '
+                        '[tk-acconti](https://pietrodefilippis.it/plugin/#pdc-tk-acconti) installato (versione 1.5.0 '
+                        'o successiva): senza il plugin non c\'è niente con cui sincronizzare.\n\n'
+                        'Se ce l\'hai, scrivi qui l\'indirizzo del tuo sito e la password di Acconti impostata nel '
+                        'plugin: telefono e sito restano allineati e per ogni cliente, progetto o acconto vince la '
+                        'modifica più recente. Senza sincronizzazione l\'app funziona lo stesso e i dati restano sul '
+                        'telefono.',
+                        coloreLink: accento,
+                        stile: TextStyle(color: grigio500, fontSize: 13, height: 1.4)),
+                    const SizedBox(height: 12),
+                    campo('Indirizzo del sito', _sito, tastiera: TextInputType.url, esempio: 'https://iltuosito.it'),
+                    campo('Password di Acconti', _password,
+                        tastiera: TextInputType.visiblePassword,
+                        nascosto: !_vedi,
+                        suffisso: IconButton(
+                          tooltip: _vedi ? 'Nascondi' : 'Mostra',
+                          icon: Icon(_vedi ? Icons.visibility_off_rounded : Icons.visibility_rounded),
+                          onPressed: () => setState(() => _vedi = !_vedi),
+                        )),
+                    BottoneTk(
+                      testo: sincronizzazione.inCorso ? 'Sincronizzazione in corso…' : 'Salva e sincronizza ora',
+                      icona: Icons.sync_rounded,
+                      onTap: sincronizzazione.inCorso ? null : _sincronizza,
+                    ),
+                    if (sincronizzazione.configurata) ...[
+                      const SizedBox(height: 10),
+                      BottoneTk(
+                        testo: 'Disattiva sincronizzazione',
+                        icona: Icons.sync_disabled_rounded,
+                        chiaro: true,
+                        onTap: sincronizzazione.inCorso ? null : _disattiva,
+                      ),
+                    ],
+                    if (sincronizzazione.ultima > 0) ...[
+                      const SizedBox(height: 8),
+                      Text('Ultima: ${dataOra(sincronizzazione.ultima)} · ${sincronizzazione.esito}',
+                          style: TextStyle(color: sincronizzazione.ultimaOk ? grigio500 : rosso, fontSize: 12)),
+                    ],
+                  ]),
+                ),
                 const SizedBox(height: 12),
                 _card(Icons.save_rounded, 'Backup dei dati', [
                   const Text(

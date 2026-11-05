@@ -18,6 +18,9 @@ class Archivio extends ChangeNotifier {
   List<SegnalatoreConProgetti> segnalatori = const [];
   bool pronto = false;
 
+  /// Chiamata a ogni modifica locale: l'app la usa per programmare la sincronizzazione col sito.
+  VoidCallback? onModifica;
+
   // ───────────────────────── lettura ─────────────────────────
 
   Future<void> ricarica() async {
@@ -86,6 +89,7 @@ class Archivio extends ChangeNotifier {
 
   Future<void> _fatto() async {
     await ricarica();
+    onModifica?.call();
   }
 
   Future<void> _traccia(DatabaseExecutor e, String tipo, String uid) async {
