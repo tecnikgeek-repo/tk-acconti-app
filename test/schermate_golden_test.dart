@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tkacconti/schermate/home.dart' show notaDati, righeBenvenuto;
 import 'package:tkacconti/tema.dart';
 import 'package:tkacconti/tk_licenza.dart';
 import 'package:tkacconti/tk_pro.dart';
@@ -48,7 +49,7 @@ void main() {
     proTk = ProTk(lic);
     addTearDown(t.view.reset);
 
-    await _mostra(t, SchermataBenvenuto(lic: lic));
+    await _mostra(t, SchermataBenvenuto(lic: lic, righeExtra: const [righeBenvenuto]));
     await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/benvenuto.png'));
 
     // con l'interruttore acceso
@@ -66,8 +67,9 @@ void main() {
           ('Acconti', '164'),
           ('Segnalatori', '2'),
           ('Da incassare', '7.310 €'),
+          ('Sincronizzazione', 'esempio.it'),
         ];
-    await _mostra(t, SchermataInformazioni(righe: righe));
+    await _mostra(t, SchermataInformazioni(righe: righe, notaDati: notaDati));
     await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/informazioni.png'));
 
     await t.drag(find.byType(Scrollable).first, const Offset(0, -2000));
@@ -75,7 +77,7 @@ void main() {
     await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/informazioni-fondo.png'));
 
     // tutta la pagina in una foto sola (telefono «lungo»)
-    await _mostra(t, SchermataInformazioni(righe: righe), lato: const Size(412, 1150));
+    await _mostra(t, SchermataInformazioni(righe: righe, notaDati: notaDati), lato: const Size(412, 1150));
     await expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/informazioni-intera.png'));
 
     await _mostra(t, const SchermataLicenze(versione: '2.2.0'));
