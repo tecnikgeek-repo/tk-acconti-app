@@ -44,10 +44,9 @@ class _SchermataHomeState extends State<SchermataHome> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       // primo avvio: benvenuto (software libero, privacy, statistiche) PRIMA di qualunque chiamata in rete
-      await benvenutoTk(context, righeExtra: const [righeBenvenuto]);
+      await benvenutoTk(context);
       if (!mounted) return;
       if (widget.crash != null) await _mostraCrash(widget.crash!);
-      sincronizzazione.sincronizzaSeServe();
       if (mounted) proponiAggiornamento(context, avvisaSeAggiornata: false);
       // invito al caffè: al primo avvio e poi al massimo una volta al mese, mai sopra un'altra finestra
       if (mounted) invitoCaffe(context);
@@ -114,7 +113,7 @@ class _SchermataHomeState extends State<SchermataHome> {
                   }),
                   AzioneTk(Icons.settings_rounded, 'Impostazioni', () => vai(context, const SchermataImpostazioni())),
                   AzioneTk(Icons.info, 'Informazioni',
-                      () => apriInformazioni(context, righe: () async => datiInformazioni(), notaDati: notaDati)),
+                      () => apriInformazioni(context, righe: () async => datiInformazioni())),
                 ],
                 sotto: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   if (_cercando) ...[
@@ -145,17 +144,7 @@ class _SchermataHomeState extends State<SchermataHome> {
                 ]),
               ),
               Expanded(
-                child: RefreshIndicator(
-                  color: accento,
-                  onRefresh: () async {
-                    if (!sincronizzazione.configurata) {
-                      avviso(context, 'Per allineare col sito imposta indirizzo e password in Impostazioni');
-                      return;
-                    }
-                    final esito = await sincronizzazione.sincronizza();
-                    if (context.mounted) avviso(context, esito);
-                  },
-                  child: ListView(
+                child: ListView(
                     padding: EdgeInsets.fromLTRB(14, 14, 14, 100 + MediaQuery.of(context).padding.bottom),
                     children: [
                       _cardSegnalatori(),
@@ -189,7 +178,6 @@ class _SchermataHomeState extends State<SchermataHome> {
                           Padding(padding: const EdgeInsets.only(bottom: 10), child: _RigaCliente(c)),
                     ],
                   ),
-                ),
               ),
             ]),
           );
@@ -339,28 +327,18 @@ class _RigaCliente extends StatelessWidget {
   }
 }
 
-/// Riga in più del benvenuto: cosa va in rete con la sincronizzazione (solo verso il sito scelto dall'utente).
-const righeBenvenuto = 'La **sincronizzazione** è facoltativa: se la attivi nelle Impostazioni, clienti, progetti '
-    'e acconti vanno solo al **tuo sito** (pagina Acconti), con la password che scegli tu.';
-
-/// Nota sotto «I tuoi dati» in Informazioni.
-const notaDati = 'Restano su questo telefono; con la sincronizzazione anche sul tuo sito.';
-
-/// Schede dati di Informazioni: quanti clienti, progetti, acconti e segnalatori, quanto c'è da incassare,
-/// a che sito si sincronizza.
+/// Schede dati di Informazioni: quanti clienti, progetti, acconti e segnalatori, e quanto c'è da incassare.
 List<(String, String)> datiInformazioni() {
   final clienti = archivio.clienti;
   final progetti = clienti.fold<int>(0, (s, c) => s + c.progetti.length);
   final acconti = clienti.fold<int>(0, (s, c) => s + c.progetti.fold<int>(0, (t, p) => t + p.acconti.length));
   final totale = clienti.fold<double>(0, (s, c) => s + c.totale);
   final incassato = clienti.fold<double>(0, (s, c) => s + c.incassato);
-  final sito = impostazioni.sito.replaceFirst(RegExp(r'^https?://'), '');
   return [
     ('Clienti', '${clienti.length}'),
     ('Progetti', '$progetti'),
     ('Acconti', '$acconti'),
     ('Segnalatori', '${archivio.segnalatori.length}'),
     ('Da incassare', euro((totale - incassato).clamp(0, double.infinity))),
-    ('Sincronizzazione', sito.isEmpty ? 'spenta' : sito),
   ];
 }

@@ -16,7 +16,6 @@ import 'package:tkacconti/dati/archivio.dart';
 import 'package:tkacconti/dati/database.dart';
 import 'package:tkacconti/dati/impostazioni.dart';
 import 'package:tkacconti/dati/modelli.dart';
-import 'package:tkacconti/dati/sincronizzazione.dart';
 import 'package:tkacconti/schermate/cliente.dart';
 import 'package:tkacconti/schermate/home.dart';
 import 'package:tkacconti/schermate/impostazioni.dart';
@@ -77,7 +76,6 @@ void main() {
     var d = f == null ? esempio() : jsonDecode(File(f).readAsStringSync());
     if (d is String) d = jsonDecode(d);
     await archivio.applicaDalSito(jsonEncode({'dati': d}), adesso());
-    sincronizzazione = Sincronizzazione(archivio, impostazioni);
     await caricaCaratteri();
   });
 
