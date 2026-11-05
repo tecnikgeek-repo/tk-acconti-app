@@ -1,6 +1,6 @@
-// Impostazioni di tk-acconti: sito e password della sincronizzazione, PIN, impronta.
+// Impostazioni di tk-acconti: PIN e impronta.
 // Al primo avvio dopo l'aggiornamento recupera quelle salvate dalla versione Kotlin
-// (SharedPreferences «tk_sync» e DataStore «tk_acconti_sicurezza»), così non si deve reinserire niente.
+// (DataStore «tk_acconti_sicurezza»), così non si deve reinserire niente.
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -16,38 +16,28 @@ class Impostazioni {
   final SharedPreferences _p;
   final FlutterSecureStorage _sicuro;
 
-  String sito = '';
-  String password = '';
   String _pinHash = '';
 
   static Future<Impostazioni> carica({FlutterSecureStorage? sicuro}) async {
     final i = Impostazioni._(await SharedPreferences.getInstance(), sicuro ?? const FlutterSecureStorage());
     if (!(i._p.getBool('migrato') ?? false)) await i._recuperaVecchie();
-    i.sito = i._p.getString('sito') ?? '';
-    i.password = await i._sicuro.read(key: 'password_sito') ?? '';
+    if (!(i._p.getBool('sync_tolta') ?? false)) await i._togliSync();
     i._pinHash = await i._sicuro.read(key: 'pin_hash') ?? '';
     return i;
   }
 
-  int get syncUltima => _p.getInt('sync_ultima') ?? 0;
-  String get syncEsito => _p.getString('sync_esito') ?? '';
   bool get biometria => _p.getBool('biometria') ?? false;
   bool get haPin => _pinHash.isNotEmpty;
 
-  Future<void> salvaSync(String nuovoSito, String nuovaPassword) async {
-    var s = nuovoSito.trim();
-    while (s.endsWith('/')) {
-      s = s.substring(0, s.length - 1);
+  /// La sincronizzazione col sito non c'è più: si cancellano indirizzo, password ed esito salvati (una volta sola).
+  Future<void> _togliSync() async {
+    for (final k in ['sito', 'sync_ultima', 'sync_esito']) {
+      await _p.remove(k);
     }
-    sito = s;
-    password = nuovaPassword.trim();
-    await _p.setString('sito', sito);
-    await _sicuro.write(key: 'password_sito', value: password);
-  }
-
-  Future<void> salvaEsitoSync(int quando, String esito) async {
-    await _p.setInt('sync_ultima', quando);
-    await _p.setString('sync_esito', esito);
+    try {
+      await _sicuro.delete(key: 'password_sito');
+    } catch (_) {}
+    await _p.setBool('sync_tolta', true);
   }
 
   // ── PIN: si salva solo l'impronta SHA-256, come prima (il vecchio PIN resta valido) ──
@@ -75,16 +65,6 @@ class Impostazioni {
     try {
       if (Platform.isAndroid) {
         final files = await getApplicationSupportDirectory(); // /data/user/0/<pacchetto>/files
-        final cartellaApp = files.parent.path;
-        final xml = File('$cartellaApp/shared_prefs/tk_sync.xml');
-        if (xml.existsSync()) {
-          final v = leggiSharedPreferencesXml(xml.readAsStringSync());
-          if ((v['sito'] ?? '').isNotEmpty) await _p.setString('sito', v['sito']!);
-          if ((v['password'] ?? '').isNotEmpty) await _sicuro.write(key: 'password_sito', value: v['password']!);
-          final ultima = int.tryParse(v['ultima'] ?? '');
-          if (ultima != null) await _p.setInt('sync_ultima', ultima);
-          if ((v['esito'] ?? '').isNotEmpty) await _p.setString('sync_esito', v['esito']!);
-        }
         final pb = File('${files.path}/datastore/tk_acconti_sicurezza.preferences_pb');
         if (pb.existsSync()) {
           final v = leggiDataStore(pb.readAsBytesSync());

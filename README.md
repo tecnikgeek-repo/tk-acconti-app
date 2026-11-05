@@ -55,8 +55,8 @@ I tuoi dati sempre recuperabili.
 </td>
 <td width="50%" valign="top">
 
-### 🔄&nbsp; Sincronizzazione col sito
-Facoltativa, con la pagina Acconti del tuo sito.
+### 📴&nbsp; Tutto sul telefono
+Niente account e niente server: funziona anche senza rete.
 
 </td>
 </tr>
@@ -81,7 +81,7 @@ Facoltativa, con la pagina Acconti del tuo sito.
 
 ## 🔒 I tuoi dati
 
-- **Privacy:** i dati restano sul telefono; con la sincronizzazione vanno solo al sito che scegli tu. Le statistiche anonime (una volta al giorno: nome, versione, sistema e un codice casuale) partono solo se dici sì nel benvenuto o in Informazioni.
+- **Privacy:** i dati restano sul telefono e non vanno da nessuna parte. Le statistiche anonime (una volta al giorno: nome, versione, sistema e un codice casuale) partono solo se dici sì nel benvenuto o in Informazioni.
 
 Nessuna pubblicità, nessun account da creare, nessun abbonamento: tutte le funzioni sono gratis, per tutti.
 

@@ -1,5 +1,5 @@
 // tk-acconti per Android e iPhone — TecnikGeek (pietrodefilippis.it)
-// Acconti dei clienti, progetti e segnalatori; si sincronizza con la pagina Acconti del sito.
+// Acconti dei clienti, progetti e segnalatori.
 // Copyright (C) 2026 Pietro De Filippis (TecnikGeek) — AGPL-3.0-or-later, vedi COPYING
 import 'dart:io';
 import 'dart:ui';
@@ -14,7 +14,6 @@ import 'app.dart';
 import 'dati/archivio.dart';
 import 'dati/database.dart';
 import 'dati/impostazioni.dart';
-import 'dati/sincronizzazione.dart';
 import 'schermate/blocco.dart';
 import 'schermate/home.dart';
 import 'tema.dart';
@@ -45,8 +44,6 @@ Future<void> _inizializza() async {
   await _copiaDiSicurezza();
   archivio = Archivio(await apriDatabase());
   await archivio.ricarica();
-  sincronizzazione = Sincronizzazione(archivio, impostazioni);
-  archivio.onModifica = sincronizzazione.pianifica;
 }
 
 /// Al primo avvio della versione Flutter copia il database della versione Kotlin (una volta sola):
